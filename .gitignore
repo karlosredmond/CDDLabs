@@ -1,3 +1,4 @@
-testGitignore/docs
-testGitignore/signal
-testGitignore/*.o
+testGitignore/
+Lab*/docs
+Lab*/*Ex
+Lab*/*.o
