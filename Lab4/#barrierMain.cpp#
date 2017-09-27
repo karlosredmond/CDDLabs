@@ -1,9 +1,9 @@
 /*! 
   \\ Author: Karl Redmond
-  \\ Date: 10th Oct 2017 fu
-  \\ brief A Semaphore Implementation to show mutual exclusion, where only one thread can access a resource at any time, in my case I am demonstrating it with "cout"
-  \									\
-  \\ Uses C++11 features such as mutex and condition variables to implement Semaphore
+  \\ Date: 10th Oct 2017
+  \\ brief A Semaphore Implementation to demonstrate a reusable barrier 
+  \									
+  \\ 
 
 */
 
@@ -13,36 +13,48 @@
 #include <vector>
 #include <thread>
 
-int count = 0 ;
-int n = 5;
-int arr[5] = {1,2,3,4,5} ;
-std::shared_ptr<Semaphore> mutex(new Semaphore(1)) ;
-std::shared_ptr<Semaphore> barrier(new Semaphore(0));
-
-void taskOne(){
+/*
+  \\Function that demonstrates reusable barrier. The two barriers act like security guards, when you get to the first guard you have to wait for all your mates, then the guard is brickin it so he lets you all through, then you meet another tough guy, but he bricks it when you all arrive again and the first guard gets his confidence back.
+*/
+void taskOne(std::shared_ptr<Semaphore> mutex, std::shared_ptr<Semaphore> barrier, std::shared_ptr<Semaphore> barrierB, std::shared_ptr<int> count, std::shared_ptr<int> n){
   mutex->Wait();
-  int value = count;
-  count++;
-  if(n==count){
-    count = 0;
+  int value = *count;
+  *count = *count + 1;
+  if(*n==*count){
+    barrierB->Wait();
     barrier->Signal();
-  
   }
   mutex ->Signal();
   barrier->Wait();
-  std::cout << "Hello from thread " << value << std::endl ;
+  std::cout << "Hello from first rendevous, Im thread " << value << std::endl ;
   barrier->Signal();
+  mutex->Wait();
+  *count = *count - 1;
+  if(*count == 0){
+    barrier ->Wait();
+    barrierB->Signal();
+  }
+  mutex->Signal();
+  barrierB->Wait();
+    std::cout << "Ive made it past the second barrier"<< std::endl ;
+  barrierB->Signal();
 }
 
-int main(void){
-  std::thread threadArr[5] ;
-  /**< Launch the threads  */
-  for(int i = 0; i < 5; i++ ){
-    threadArr[i] = std::thread(taskOne);
-  }
-  for(int i = 0; i < 5; i++){
-    threadArr[i].join();
-  }
 
+int main(void){
+  std::shared_ptr<int> count(new int(0));
+  std::shared_ptr<int> n(new int(2));
+  std::thread threadArr[2] ;
+  std::shared_ptr<Semaphore> mutex(new Semaphore(1)) ;
+  std::shared_ptr<Semaphore> barrier(new Semaphore(0));
+ std::shared_ptr<Semaphore> barrierB(new Semaphore(1));
+  /**< Launch the threads  */
+  for(int i = 0; i < 2; i++ ){
+    threadArr[i] = std::thread(taskOne, mutex, barrier, barrierB, count, n);
+  }
+  for(int i =0; i <2; i++){
+    threadArr[i].join(); 
+  }
+      std::cout << "All Threads Finished, back in main"<< std::endl ;
   return 0;
 }
