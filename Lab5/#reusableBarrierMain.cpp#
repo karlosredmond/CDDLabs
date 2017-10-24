@@ -16,7 +16,6 @@
   \\Function that demonstrates reusable barrier.
 */
 void taskOne(ReusableBarrier rb){
-	
   	rb.FirstPhase();
   	rb.SecondPhase();
 }

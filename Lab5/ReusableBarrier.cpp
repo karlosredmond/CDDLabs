@@ -8,35 +8,32 @@
 */
 #include "ReusableBarrier.h"
 #include <iostream>
-class ReusableBarrier;
+
 void ReusableBarrier::FirstPhase(){
-  	ReusableBarrier::mutex->Wait();
-	ReusableBarrier::count++;
-	if(ReusableBarrier::count == n){
-	  ReusableBarrier::barrierB->Wait();
-	  ReusableBarrier::barrierA->Signal();
+  	mutex->Wait();
+	count++;
+	if(count == n){
+	  barrierB->Wait();
+	  barrierA->Signal();
 	}
-	ReusableBarrier::mutex->Signal();
-	ReusableBarrier::barrierA->Wait();
+	mutex->Signal();
+	barrierA->Wait();
 }
 
-void SecondPhase(){
+void ReusableBarrier::SecondPhase(){
 	std::cout << "Hello from first rendevous, Im thread "  << std::endl ;
-	ReusableBarrier::mutex->Wait();
-	ReusableBarrier::count--;
-	if(ReusableBarrier::count == 0){
-	  	ReusableBarrier::barrierA->Wait();
-	  	ReusableBarrier::barrierB->Signal();
+	mutex->Wait();
+	count--;
+	if(count == 0){
+	  	barrierA->Wait();
+	  	barrierB->Signal();
 	}
-	ReusableBarrier::mutex->Signal();
-	ReusableBarrier::barrierB->Wait();
+	mutex->Signal();
+	barrierB->Wait();
 	std::cout << "Ive made it past the second barrier"<< std::endl ;
-	ReusableBarrier::barrierB->Signal();
+       barrierB->Signal();
 }
 
-void Wait(){
-  	FirstPhase();
-	SecondPhase();
-}
+	
 
 
