@@ -15,16 +15,15 @@
 /*
   \\Function that demonstrates reusable barrier.
 */
-void taskOne(ReusableBarrier rb){
-	
-  	rb.FirstPhase();
-  	rb.SecondPhase();
+void taskOne(std::shared_ptr<ReusableBarrier> rb){
+  	rb->FirstPhase();
+  	rb->SecondPhase();
 }
 
 
 int main(void){
   std::thread threadArr[2] ;
-  ReusableBarrier rb(2);
+  std::shared_ptr<ReusableBarrier> rb(new ReusableBarrier(2));
   /**< Launch the threads  */
   for(int i = 0; i < 2; i++ ){
     threadArr[i] = std::thread(taskOne, rb);

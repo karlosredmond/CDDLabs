@@ -10,28 +10,36 @@
 #include <iostream>
 
 void ReusableBarrier::FirstPhase(){
-  	mutex->Wait();
+  	this->mutex->Wait();
 	count++;
 	if(count == n){
-	  barrierB->Wait();
-	  barrierA->Signal();
+	  this->barrierB->Wait();
+	  this->barrierA->Signal();
 	}
-	mutex->Signal();
-	barrierA->Wait();
+	this->mutex->Signal();
+	this->barrierA->Wait();
 }
 
 void ReusableBarrier::SecondPhase(){
 	std::cout << "Hello from first rendevous, Im thread "  << std::endl ;
-	mutex->Wait();
+	this->mutex->Wait();
 	count--;
 	if(count == 0){
-	  	barrierA->Wait();
-	  	barrierB->Signal();
+	  	this->barrierA->Wait();
+	  	this->barrierB->Signal();
 	}
-	mutex->Signal();
-	barrierB->Wait();
+	this->mutex->Signal();
+	this->barrierB->Wait();
 	std::cout << "Ive made it past the second barrier"<< std::endl ;
-       barrierB->Signal();
+	this->barrierB->Signal();
+}
+
+ReusableBarrier::ReusableBarrier(int count){
+  	  count =  0;
+	  n = count;
+	  std::shared_ptr<Semaphore>  mutex(new Semaphore(1));
+ 	  std::shared_ptr<Semaphore>  barrierA(new Semaphore(0));
+	  std::shared_ptr<Semaphore>  barrierB(new Semaphore(0));
 }
 
 	

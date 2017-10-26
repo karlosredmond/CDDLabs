@@ -21,12 +21,6 @@ public:
 	void Wait();
 	void FirstPhase();
 	void SecondPhase();
-	ReusableBarrier(int count){
-	  count =  0;
-	  n = count;
-	  std::shared_ptr<Semaphore>  mutex(new Semaphore(1));
- 	  std::shared_ptr<Semaphore>  barrierA(new Semaphore(0));
-	  std::shared_ptr<Semaphore>  barrierB(new Semaphore(0));
-	}
+	ReusableBarrier(int count);
 	
 };
