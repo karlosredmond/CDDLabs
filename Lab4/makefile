@@ -1,4 +1,5 @@
 #Karl Redmond 03/10/2017
+#License Employed: GNU General Public License v3.0
 #Makefile
 #Used to contain commands to compile project
 #added -I. to look for any header files with the same .cpp name
@@ -15,7 +16,7 @@ CFILES = reusableBarrierMain.o ReusableBarrier.o Semaphore.o
 ALL: $(CFILES)
 	$(CC) $(CFILES) $(CFLAGS) -o $(EXE) $(DEBUGFLAGS)
 
-DEBUG: DEBUGFLAGS = -g -O0
+DEBUG: DEBUGFLAGS = -g -O0 -Wall
 DEBUG: ALL
 
 #this is customary and just deletes all .o files

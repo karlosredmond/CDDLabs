@@ -1,6 +1,7 @@
 /*! 
   \\ Author: Karl Redmond
   \\ Date: 10th Oct 2017
+  \\ License Employed: GNU General Public License v3.0
   \\ brief: ReusableBarrier Class
   \									
   \\ 
@@ -49,6 +50,7 @@ ReusableBarrier::ReusableBarrier(int count){
 	  mutex=std::make_shared<Semaphore>(1);
 	  barrierA=std::make_shared<Semaphore>(0);
 	  barrierB=std::make_shared<Semaphore>(1);
+	  
 }
 
 	

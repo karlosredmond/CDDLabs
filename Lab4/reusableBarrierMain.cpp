@@ -1,6 +1,7 @@
 /*! 
   \\ Author: Karl Redmond
   \\ Date: 10th Oct 2017
+  \\ License Employed: GNU General Public License v3.0
   \\ brief A Semaphore Implementation to demonstrate a reusable barrier 
   \									
   \\ 
