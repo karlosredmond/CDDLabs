@@ -8,26 +8,18 @@
 #include "SafeBuffer.h"
 #include <iostream>
 #include <chrono>
-#include <string>
 #include <thread>
 #include <ctime>
-#include <cstdlib>
 #include <random>
 
 int characterCountBuffer[26] = {0};
-
-int intRand(int min, int max) {
-  static thread_local std::mt19937 generator;
-  std::uniform_int_distribution<int> distribution(min, max);
-  return distribution(generator);
-}
-
 
 void ConsumerMethod(std::shared_ptr<SafeBuffer> sBuff) {
   char c;
   do {
     c = sBuff->Remove();
     std::cout << "Consuming " << c << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(std::rand()%1000));
     characterCountBuffer[c]++;
   } while ( c != 'X');
 }
@@ -36,12 +28,12 @@ void ProducerMethod(std::shared_ptr<SafeBuffer> sBuff, int numCharacters) {
   char c;
   int i = 0;
   do {
-    c = intRand(0, 25) + 97;
+    std::this_thread::sleep_for(std::chrono::milliseconds(std::rand()%1000));
+    c =  std::rand() % 26 + 97;
     if ( ++i == numCharacters ) {
       c = 'X';
     }
     sBuff->Add(c);
-    std::this_thread::sleep_for(std::chrono::milliseconds(intRand(0, 1000)));
     std::cout << "Producing " << c << std::endl;
   } while ( c != 'X' );
 }
