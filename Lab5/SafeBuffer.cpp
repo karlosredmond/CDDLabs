@@ -10,25 +10,25 @@
 
 SafeBuffer::SafeBuffer() {
   items = std::make_shared<Semaphore>(0);
-  mutex = std::make_shared<Semaphore>(0);
+  mutex = std::make_shared<Semaphore>(1);
   spaces = std::make_shared<Semaphore>(1000);
 }
 
-void SafeBuffer::Producer(char c) {
+void SafeBuffer::Add(char c) {
   spaces->Wait();
   mutex->Wait();
-    safeBuffer.push(c);
+  safeBuffer.push(c);
   mutex->Signal();
   items->Signal();
 }
 
-char SafeBuffer::Consumer() {
+char SafeBuffer::Remove() {
   char c;
   items->Wait();
   mutex->Wait();
   c = safeBuffer.front();
   safeBuffer.pop();
   mutex->Signal();
-  items->Signal();
+  spaces->Signal();
   return c;
 }

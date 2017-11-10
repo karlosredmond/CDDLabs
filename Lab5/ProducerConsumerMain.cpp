@@ -8,54 +8,67 @@
 #include "SafeBuffer.h"
 #include <iostream>
 #include <chrono>
+#include <string>
 #include <thread>
+#include <ctime>
+#include <cstdlib>
+#include <random>
 
 int characterCountBuffer[26] = {0};
 
-char generateRandomCharacter() {
-  int n = std::rand() % 26;
-  char c = n + 97;
-  return c;
+int intRand(int min, int max) {
+  static thread_local std::mt19937 generator;
+  std::uniform_int_distribution<int> distribution(min, max);
+  return distribution(generator);
 }
+
 
 void ConsumerMethod(std::shared_ptr<SafeBuffer> sBuff) {
   char c;
   do {
-    c = sBuff->Consumer();
-    characterCountBuffer[c - 97]++;
+    c = sBuff->Remove();
+    std::cout << "Consuming " << c << std::endl;
+    characterCountBuffer[c]++;
   } while ( c != 'X');
 }
 
-void ProducerMethod(std::shared_ptr<SafeBuffer> sBuff) {
+void ProducerMethod(std::shared_ptr<SafeBuffer> sBuff, int numCharacters) {
   char c;
+  int i = 0;
   do {
-    std::this_thread::sleep_for(std::chrono::milliseconds(std::rand()%1000));
-    c = generateRandomCharacter();
-    sBuff->Producer(c);
+    c = intRand(0, 25) + 97;
+    if ( ++i == numCharacters ) {
+      c = 'X';
+    }
+    sBuff->Add(c);
+    std::this_thread::sleep_for(std::chrono::milliseconds(intRand(0, 1000)));
+    std::cout << "Producing " << c << std::endl;
   } while ( c != 'X' );
 }
 
 int main(void) {
-  const int sizeOfBuffer = 1000;
   int numCharacters;
   std::shared_ptr<SafeBuffer> sBuff(new SafeBuffer);
-  std::thread producerThread;
-  std::thread consumerThread;
+  std::thread producerThread[10];
+  std::thread consumerThread[10];
 
   std::cout << "How many characters do we add?" << std::endl;
   std::cin >> numCharacters;
 
-  producerThread = std::thread(ProducerMethod, sBuff);
-  consumerThread = std::thread(ConsumerMethod, sBuff);
-  producerThread.join();
-  consumerThread.join();
-  /**< Launch the threads  */
-                                    /*  for ( int i = 0; i < numThreads; i++ ) {
-    threadArr[i] = std::thread(taskOne, rb);
+  for ( int i = 0; i < 10; i++ ) {
+    producerThread[i] = std::thread(ProducerMethod, sBuff, numCharacters);
+    consumerThread[i] = std::thread(ConsumerMethod, sBuff);
   }
-  for ( int i =0; i <numThreads; i++ ) {
-    threadArr[i].join();
-    }*/
+
+  for ( int i = 0; i < 10; ++i ) {
+    producerThread[i].join();
+    consumerThread[i].join();
+  }
+
+  for ( char i = 97; i < 123; ++i ) {
+    std::cout << i << " " << characterCountBuffer[i] << std::endl;
+  }
+
   std::cout << "All Threads Finished, back in main"<< std::endl;
   return 0;
 }
