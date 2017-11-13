@@ -3,16 +3,21 @@
    Author: Karl Redmond 
    Date:   Thursday,  9 November 2017.
    License:GNU General Public License v3.0
-   Brief:Producer consumer main*/
+   Brief:Producer consumer main uses SafeBuffer to demonstrate a number of threads that are sharing a buffer. N threads will produce, and M threads will consume.*/
 
 #include "SafeBuffer.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include <ctime>
-#include <random>
 
+/**
+   Central Buffer for storing count of characters.
+ */
 int characterCountBuffer[26] = {0};
+
+/**
+   ConsumerMethod removes a character from the safe buffer, at random time intevals. It also keeps track of the count of each letter removed.
+ */
 
 void ConsumerMethod(std::shared_ptr<SafeBuffer> sBuff) {
   char c;
@@ -23,6 +28,10 @@ void ConsumerMethod(std::shared_ptr<SafeBuffer> sBuff) {
     characterCountBuffer[c]++;
   } while ( c != 'X');
 }
+
+/**
+   ProducerMethod adds a random character to a safe buffer, at random timer intervals. 
+ */
 
 void ProducerMethod(std::shared_ptr<SafeBuffer> sBuff, int numCharacters) {
   char c;
@@ -36,6 +45,16 @@ void ProducerMethod(std::shared_ptr<SafeBuffer> sBuff, int numCharacters) {
     sBuff->Add(c);
     std::cout << "Producing " << c << std::endl;
   } while ( c != 'X' );
+}
+
+/**
+   PrintArray prints the count of each letter consumed: a 10...
+ */
+
+void PrintArray() {
+  for ( char i = 97; i < 123; ++i ) {
+    std::cout << i << " " << characterCountBuffer[i] << std::endl;
+  }
 }
 
 int main(void) {
@@ -57,10 +76,7 @@ int main(void) {
     consumerThread[i].join();
   }
 
-  for ( char i = 97; i < 123; ++i ) {
-    std::cout << i << " " << characterCountBuffer[i] << std::endl;
-  }
-
+  PrintArray();
   std::cout << "All Threads Finished, back in main"<< std::endl;
   return 0;
 }

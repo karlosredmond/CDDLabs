@@ -13,7 +13,6 @@
 #include <queue>
 
 /*!  Class used to provide safe access to a shared buffer.*/
-
 class SafeBuffer {
  public:
   std::shared_ptr<Semaphore> mutex;
